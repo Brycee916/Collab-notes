@@ -1,0 +1,34 @@
+import express from "express";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
+import { JWT_SECRET } from "../config";
+
+const router = express.Router();
+
+// api for the user to register for an account
+router.post("/register", async (req, res) => {
+    try{
+        // get data from req body
+        const {email, password, displayName } = req.body;
+        // if there is no email or password, error
+        if (!email || !password) return res.status(400).json({ message: "Missing fields"});
+
+        // check if the email already exists
+        const exists = await User.findOne({ email });
+        if (exists) return res.status(400).json({ message: "Email already in use" });
+
+        // hash the password that the new user provided using 10 salt and put it into database
+        const passwordHash = await bcrypt.hash(password, 10);
+        const user = new User({ email, passwordHash, displayName });
+        await user.save();
+
+        // set the jwt parameters and send back the token
+        const token = jwt.sign({ id: user._id }, JWT_SECRET, {expiresIn: "7d" });
+        res.json({ token, user: { id: user._id, email: user.email, displayName } });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
