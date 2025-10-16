@@ -1,0 +1,101 @@
+Perfect — that’s a very realistic goal. Let’s scope it to a medium-sized project that gives you a fully working collaborative note editor with real-time sync and accounts, but without overengineering (no CRDT internals, no complex infra).
+
+We’ll keep it achievable within ~3–4 weeks of part-time work.
+
+🔹 Project goal (simplified version)
+
+Build a collaborative note app where:
+
+Two or more users can edit the same note in real time.
+
+Each user has an account (signup/login).
+
+Notes are stored in a database and can be reloaded later.
+
+Uses WebSockets for real-time updates.
+
+🔹 Tech stack (balanced between simplicity and capability)
+Part	Choice	Why
+Frontend	React (Vite)	Fast dev setup, easy state management.
+Editor	Quill.js	Simple rich text editor with minimal setup.
+Backend	Node.js + Express + Socket.IO	Socket.IO simplifies real-time messaging.
+Database	MongoDB (via Mongoose)	Easy to store note contents as JSON/text.
+Auth	JWT (JSON Web Token)	Simple login/session without Firebase complexity.
+
+You can later swap Socket.IO for Yjs if you want full CRDT merging — but for now, Socket.IO keeps it lightweight and understandable.
+
+🔹 What you’ll actually build
+
+✅ Phase 1 — Core Collaboration (Week 1–1.5)
+
+A React + Quill editor that updates in real time between connected users.
+
+Backend WebSocket server that syncs document content between users.
+
+Basic REST API to load/save notes.
+
+✅ Phase 2 — User Accounts (Week 2)
+
+Add signup/login using JWT.
+
+Only logged-in users can access notes.
+
+Associate notes with users in MongoDB.
+
+✅ Phase 3 — Document Management (Week 3)
+
+A dashboard showing a list of notes per user.
+
+Create/edit/delete notes.
+
+Share note link (basic URL share).
+
+✅ (Optional) Phase 4 — Polish (Week 4)
+
+Save notes automatically every few seconds.
+
+Add collaborator cursors or colored names.
+
+Deploy to Render or Railway (backend) + Netlify or Vercel (frontend).
+
+🔹 Folder structure
+collab-notes/
+ ├── backend/
+ │    ├── server.js
+ │    ├── models/Note.js
+ │    ├── models/User.js
+ │    ├── routes/auth.js
+ │    ├── routes/notes.js
+ │    └── package.json
+ └── frontend/
+      ├── src/
+      │    ├── App.jsx
+      │    ├── components/Editor.jsx
+      │    ├── pages/Login.jsx
+      │    ├── pages/Dashboard.jsx
+      │    ├── pages/NotePage.jsx
+      │    └── api.js
+      └── package.json
+
+🔹 Architecture diagram (conceptually)
+React (frontend)
+   │
+   ├── REST: /login, /signup, /notes
+   │
+   └── WebSocket: /sync/:noteId  ← handles real-time typing
+          │
+     Node.js + Socket.IO server
+          │
+     MongoDB (stores users and notes)
+
+🔹 Example flow
+
+User logs in → gets JWT token.
+
+User opens a note (/note/:id) → frontend connects to backend via WebSocket.
+
+Each keystroke or text change emits an event ("text-update") to the server.
+
+Server broadcasts that change to all other connected users editing the same note.
+
+Notes are periodically saved to MongoDB.
