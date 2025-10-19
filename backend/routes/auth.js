@@ -11,7 +11,7 @@ router.post("/register", async (req, res) => {
     try{
         // get data from req body
         const {email, password, displayName } = req.body;
-        // if there is no email or password, error
+        // if there is no email or password received, error
         if (!email || !password) return res.status(400).json({ message: "Missing fields"});
 
         // check if the email already exists
@@ -42,7 +42,7 @@ router.post("/login", async (req, res) => {
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
-        // bycrpt with hash the password sent in and compare that hash to the one stored in db
+        // bycrpt to hash the password sent in and compare that hash to the one stored in db
         const ok = await bcrypt.compare(password, user.passwordHash);
         if (!ok) return res.status(400).json({ message: "Invalid credentials" });
 
