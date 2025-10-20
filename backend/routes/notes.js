@@ -4,7 +4,14 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.use(authMiddleware);
+/**
+    registers authMiddleware function to run for every request that reaches this router. tells express to
+    run authMiddleware(req,res,next) before handling any route defined in this router. basically it'll check that 
+    user Token before doing anything. In that process, it'll verify JWT from authorization header, load user from DB,
+    and set req.user. If authentication succeeds then it calls next(), and the route handler runs with req.user
+    available.
+ */
+router.use(authMiddleware); 
 
 // create a note
 router.post("/", async (req, res) => {
@@ -13,3 +20,15 @@ router.post("/", async (req, res) => {
     await note.save();
     res.json(note);
 });
+
+// list notes for a user
+router.get("/", async (req, res) => {
+    // get all the notes for that user and sort them by the last date updated
+    const notes = (await Note.find({ owner: req.user._id })).sort({ updatedAt: -1 });
+    res.json(notes);
+});
+
+// get single note
+
+
+
