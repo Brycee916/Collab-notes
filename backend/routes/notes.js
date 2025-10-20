@@ -29,6 +29,17 @@ router.get("/", async (req, res) => {
 });
 
 // get single note
+router.get("/:id", async (req, res) => {
+    const note = await Note.findById(req.params.id);
+    if (!note) return res.status(404).json({ message: "Note not found" });
+
+    //access control if owner or collaborator
+    const allowed = note.owner.equals(req.user._id) || note.collaborators.inludes(req.user._id);
+    if(!allowed) return res.status(403).json({ message: "Forbidden" }); //not owner nor collaborator - no access
+    res.json(note);
+});
+
+// update note metadata or manual save
 
 
 
