@@ -53,4 +53,6 @@ router.put("/:id", async (req, res) => {
     res.json(note);
 });
 
+export default router;
+
 
