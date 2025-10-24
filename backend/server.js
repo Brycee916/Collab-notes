@@ -5,3 +5,6 @@ import mongoose from "mongoose";
 import cors from "cors";
 import { PORT, MONGO_URI, JWT_SECRET } from "./config.js";
 import authRoutes from "./routes/auth.js";
+import noteRoutes from "./routes/notes.js";
+import Note from "./models/Note.js";
+import jwt from "jsonwebtoken";
